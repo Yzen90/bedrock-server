@@ -113,11 +113,11 @@ EOM
 # Link instance files to run directory.
 echo "Linking instance files to run directory..."
 
-ln -rs "instances/${instance_name}/worlds" "run/${instance_name}/worlds"
+ln -rsf "instances/${instance_name}/worlds" "run/${instance_name}/worlds"
 
-ln -rs "instances/${instance_name}/permissions.json" "run/${instance_name}/permissions.json"
-ln -rs "instances/${instance_name}/server.properties" "run/${instance_name}/server.properties"
-ln -rs "instances/${instance_name}/whitelist.json" "run/${instance_name}/whitelist.json"
+ln -rsf "instances/${instance_name}/permissions.json" "run/${instance_name}/permissions.json"
+ln -rsf "instances/${instance_name}/server.properties" "run/${instance_name}/server.properties"
+ln -rsf "instances/${instance_name}/whitelist.json" "run/${instance_name}/whitelist.json"
 
 
 echo ""

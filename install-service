@@ -33,7 +33,7 @@ fi
 # Link unit file to /etc/systemd/system
 unit_file_absolute="$(readlink -f "${unit_file}")"
 
-ln -s $unit_file_absolute "/etc/systemd/system/mcbs-${instance_name}.service"
+ln -sf $unit_file_absolute "/etc/systemd/system/mcbs-${instance_name}.service"
 echo "Created link to mcbs-${instance_name}.service in /etc/systemd/system"
 
 
