@@ -1,0 +1,51 @@
+#!/bin/bash
+
+# Link, enable and start systemd service unit file for bedrock server instance
+
+# Usage: ./install-service <instance name>
+#
+#   <instance name>
+#     Name of the instance that will be installed.
+#
+
+# Script arguments.
+instance_name=$1
+
+
+# Abort if script is not running as root.
+if ! [ $(id -u) = 0 ]; then
+   echo "This script must be run as root"
+   exit 1
+fi
+
+
+# Abort if sytemd service unit file is not present.
+instance_name="$(echo "$instance_name" | awk '{print tolower($0)}')"
+instance_name="$(echo -e "${instance_name}" | tr -d '[[:space:]]')"
+unit_file="instances/${instance_name}/mcbs-${instance_name}.service"
+
+if [ ! -f $unit_file ]; then
+  echo "Unit file is not present, cannot install service."
+  exit 1
+fi
+
+
+# Link unit file to /etc/systemd/system
+unit_file_absolute="$(readlink -f "${unit_file}")"
+
+ln -s $unit_file_absolute "/etc/systemd/system/mcbs-${instance_name}.service"
+echo "Created link to mcbs-${instance_name}.service in /etc/systemd/system"
+
+
+# Enable and start the service
+echo "Enabling and starting the service."
+systemctl enable "mcbs-${instance_name}"
+systemctl start "mcbs-${instance_name}"
+
+
+echo ""
+echo "Bedrock Server service install completed."
+echo "To verify the service status, run:"
+echo ""
+echo "  systemctl status mcbs-${instance_name}"
+echo ""

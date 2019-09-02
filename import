@@ -1,0 +1,128 @@
+#!/bin/bash
+
+# Import existing bedrock server files
+
+# Usage: ./import <source directory> <instance name>
+#
+#   <source directory>
+#     Path of directory that has existing permissions.json, server.properties,
+#     whitelist.json files and worlds directory.
+#
+#   <instance name>
+#     Name that will be used in the instances directory and as the systemd
+#     service name in the form of "mcbs-<instance name>".
+#
+
+# Script arguments.
+source_dir=$1
+instance_name=$2
+
+
+# Abort if <instance name> already exists in instances directory.
+instance_name="$(echo "$instance_name" | awk '{print tolower($0)}')"
+instance_name="$(echo -e "${instance_name}" | tr -d '[[:space:]]')"
+
+if [ -d "instances/${instance_name}" ]; then
+  echo "Directory ./instances/${instance_name}/ is present, use another instance name or delete ./instances/${instance_name}/"
+  exit 1
+fi
+
+
+# Fetch current bedrock server url.
+echo "Trying to fetch bedrock server url..."
+
+url="$(curl -s https://www.minecraft.net/es-mx/download/server/bedrock/ | grep -P '(https:\/\/.+linux.+\.zip)' -o)"
+filename="$(echo $bedrock_server_uri | grep -P '(bedrock-server.+\.zip)' -o)"
+
+echo "url: <${url}>"
+
+
+# Download current bedrock server or skip if already downloaded.
+if [ -f "cache/${filename}" ]; then
+  echo "${filename} exists in cache directory, download will be skipped."
+else
+  echo "Download start..."
+  wget $url -q -P cache/
+  echo "Download finished."
+fi
+
+
+# Create ./instances/ and ./run/ if not exists.
+if [ ! -d instances ]; then
+  mkdir instances
+fi
+
+if [ ! -d run ]; then
+  mkdir run
+fi
+
+
+# Prepare directory to run instance at ./run/<instance name>
+# Extract bedrock server zip file to ./run/<instance name>
+# Create launcher script for instance.
+rm -rf "run/${instance_name}"
+mkdir "run/${instance_name}"
+
+echo "Extracting ${filename} to ./run/${instance_name}/"
+
+unzip -qq "cache/${filename}" -d "run/${instance_name}/"
+
+echo "Finished extraction."
+
+cat > "run/${instance_name}/bedrock_server.sh" <<- EOM
+#!/bin/bash
+cd "\${0%/*}"
+LD_LIBRARY_PATH=. ./bedrock_server
+EOM
+
+chmod 755 "run/${instance_name}/bedrock_server.sh"
+run_user="$(stat -c "%U" "run/${instance_name}/bedrock_server.sh")"
+run_path="$(readlink -f "run/${instance_name}/bedrock_server.sh")"
+
+
+# Create directory for instance files at ./instances/<instance name>
+# Copy the existing bedrock server files to ./instances/<instance name>
+# Create systemd service unit file.
+mkdir "instances/${instance_name}"
+
+echo "Importing bedrock server files..."
+
+cp -R "${source_dir}/worlds" "instances/${instance_name}/worlds"
+
+cp "${source_dir}/permissions.json" "instances/${instance_name}/permissions.json"
+cp "${source_dir}/server.properties" "instances/${instance_name}/server.properties"
+cp "${source_dir}/whitelist.json" "instances/${instance_name}/whitelist.json"
+
+cat > "instances/${instance_name}/mcbs-${instance_name}.service" <<- EOM
+[Unit]
+Description=Minecraft Bedrock Server Instance ("${instance_name}")
+After=network.target
+After=systemd-user-sessions.service
+After=network-online.target
+
+[Service]
+Type=simple
+User=$run_user
+ExecStart=$run_path
+
+[Install]
+WantedBy=multi-user.target
+EOM
+
+
+# Link instance files to run directory.
+echo "Linking instance files to run directory..."
+
+ln -rs "instances/${instance_name}/worlds" "run/${instance_name}/worlds"
+
+ln -rs "instances/${instance_name}/permissions.json" "run/${instance_name}/permissions.json"
+ln -rs "instances/${instance_name}/server.properties" "run/${instance_name}/server.properties"
+ln -rs "instances/${instance_name}/whitelist.json" "run/${instance_name}/whitelist.json"
+
+
+echo ""
+echo "Bedrock Server import completed."
+echo "To create, enable and start the systemd service for <${instance_name}>, run:"
+echo ""
+echo "  sudo ./install-service ${instance_name}"
+echo ""
