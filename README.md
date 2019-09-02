@@ -28,7 +28,7 @@ Or download and extract:
     unzip master.zip
     cd bedrock-server-master
 
-[Back to top](#minecraft™-bedrock-server-convenience-scripts)
+[Back to top](#minecraft-bedrock-server-convenience-scripts)
 
 ## Update the scripts
 
@@ -43,13 +43,13 @@ Or download and extract in directory that conains existing bedrock-server-master
     unzip -o master.zip
     cd bedrock-server-master
 
-[Back to top](#minecraft™-bedrock-server-convenience-scripts)
+[Back to top](#minecraft-bedrock-server-convenience-scripts)
 
 ## New bedrock server instance
 
     TODO
 
-[Back to top](#minecraft™-bedrock-server-convenience-scripts)
+[Back to top](#minecraft-bedrock-server-convenience-scripts)
 
 ## Import existing bedrock server files to new instance
 
@@ -89,7 +89,7 @@ Install service and verify:
     :~/bedrock-server$ sudo ./install-service awesome-world
     :~/bedrock-server$ systemctl status mcbs-awesome-world
 
-[Back to top](#minecraft™-bedrock-server-convenience-scripts)
+[Back to top](#minecraft-bedrock-server-convenience-scripts)
 
 ## Update bedrock server instance
 
@@ -107,4 +107,4 @@ To force the update if the instance is up to date, run `rm ./instances/<instance
     :~/bedrock-server$ ./update awesome-world
     :~/bedrock-server$ sudo systemctl start mcbs-awesome-world
 
-[Back to top](#minecraft™-bedrock-server-convenience-scripts)
+[Back to top](#minecraft-bedrock-server-convenience-scripts)
