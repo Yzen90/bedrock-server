@@ -32,7 +32,7 @@ fi
 echo "Trying to fetch bedrock server url..."
 
 url="$(curl -s https://www.minecraft.net/es-mx/download/server/bedrock/ | grep -P '(https:\/\/.+linux.+\.zip)' -o)"
-filename="$(echo $bedrock_server_uri | grep -P '(bedrock-server.+\.zip)' -o)"
+filename="$(echo $url | grep -P '(bedrock-server.+\.zip)' -o)"
 
 echo "url: <${url}>"
 
@@ -95,7 +95,7 @@ cp "${source_dir}/whitelist.json" "instances/${instance_name}/whitelist.json"
 
 cat > "instances/${instance_name}/mcbs-${instance_name}.service" <<- EOM
 [Unit]
-Description=Minecraft Bedrock Server Instance ("${instance_name}")
+Description=Minecraft Bedrock Server Instance (${instance_name})
 After=network.target
 After=systemd-user-sessions.service
 After=network-online.target
