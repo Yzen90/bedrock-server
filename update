@@ -1,0 +1,115 @@
+#!/bin/bash
+
+# Update bedrock server instance with current version in minecraft.net
+
+# Usage: ./update <instance name>
+#
+#   <instance name>
+#     Name of the instance that will be updated. This argument
+#     will be converted to lowercase and it's whitespace trimmed.
+
+# Script arguments.
+instance_name=$1
+
+
+# Abort if service of <instance name> is running.
+instance_name="$(echo "$instance_name" | awk '{print tolower($0)}')"
+instance_name="$(echo -e "${instance_name}" | tr -d '[[:space:]]')"
+
+active_status="$(systemctl status mcbs-${instance_name} | grep -P '(Active: active)' -o)"
+
+if [ "$active_status" == "Active: active" ]; then
+  echo "Service mcbs-${instance_name} is active. To stop it, run:"
+  echo ""
+  echo "  sudo systemctl stop mcbs-${instance_name}"
+  echo ""
+  exit 1
+fi
+
+
+# Fetch current bedrock server download url.
+echo "Trying to fetch minecraft.net bedrock server url..."
+
+url="$(curl -s https://www.minecraft.net/es-mx/download/server/bedrock/ | grep -P '(https:\/\/.+linux.+\.zip)' -o)"
+filename="$(echo $url | grep -P '(bedrock-server.+\.zip)' -o)"
+
+echo "url: [${url}]"
+echo "filename: [${filename}]"
+
+
+# If file instances/<instance name>/running-version does not exist, continue update
+# otherwise check if already running last version.
+if [ -f "instances/${instance_name}/running-version" ]; then
+  running_version="$(cat instances/${instance_name}/running-version)"
+  echo "running version: [${filename}]"
+
+  if [ "$running_version" == "$filename" ]; then
+    echo "Already up to date, to force update run:"
+    echo ""
+    echo "  rm ./instances/${instance_name}/running-version && ./update ${instance_name}"
+    echo ""
+    exit 0
+  fi
+fi
+
+
+# Download current bedrock server or skip if already downloaded.
+echo ""
+if [ -f "cache/${filename}" ]; then
+  echo "${filename} exists in cache directory, download will be skipped."
+else
+  echo "Download start..."
+  wget $url -q -P cache/
+  echo "Download finished."
+fi
+
+
+# Create ./instances/ and ./run/ if not exists.
+if [ ! -d instances ]; then
+  mkdir instances
+fi
+
+if [ ! -d run ]; then
+  mkdir run
+fi
+
+
+# Delete ./run/<instance name> to extract new bedrock server zip file.
+# Create launcher script for instance.
+# Update ./instances/<instance name>/running-version
+rm -rf "run/${instance_name}"
+mkdir "run/${instance_name}"
+
+echo "Extracting ${filename} to ./run/${instance_name}/"
+
+unzip -qq "cache/${filename}" -d "run/${instance_name}/"
+
+echo "Finished extraction."
+
+cat > "run/${instance_name}/bedrock_server.sh" <<- EOM
+#!/bin/bash
+cd "\${0%/*}"
+LD_LIBRARY_PATH=. ./bedrock_server
+EOM
+
+chmod 755 "run/${instance_name}/bedrock_server.sh"
+
+printf "%s" "$filename" > "instances/${instance_name}/running-version"
+
+
+# Link instance files to run directory.
+echo "Linking instance files to run directory..."
+
+ln -rsf "instances/${instance_name}/worlds" "run/${instance_name}/worlds"
+
+ln -rsf "instances/${instance_name}/permissions.json" "run/${instance_name}/permissions.json"
+ln -rsf "instances/${instance_name}/server.properties" "run/${instance_name}/server.properties"
+ln -rsf "instances/${instance_name}/whitelist.json" "run/${instance_name}/whitelist.json"
+
+
+echo ""
+echo "Bedrock Server instance update completed."
+echo "If service for instance is installed, it can be started now:"
+echo ""
+echo "  sudo systemctl start mcbs-${instance_name}"
+echo ""

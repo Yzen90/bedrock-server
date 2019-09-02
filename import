@@ -5,13 +5,13 @@
 # Usage: ./import <source directory> <instance name>
 #
 #   <source directory>
-#     Path of directory that has existing permissions.json, server.properties,
-#     whitelist.json files and worlds directory.
+#     Path of directory that contains existing worlds directory and permissions.json, server.properties,
+#     whitelist.json files.
 #
 #   <instance name>
-#     Name that will be used in the instances directory and as the systemd
-#     service name in the form of "mcbs-<instance name>".
-#
+#     Name that will be used as the systemd service name in the form of `mcbs-<instance name>` and
+#     in the `./instances` and `./run` directories for the new bedrock server instance. This argument
+#     will be converted to lowercase and it's whitespace trimmed.
 
 # Script arguments.
 source_dir=$1
@@ -23,18 +23,23 @@ instance_name="$(echo "$instance_name" | awk '{print tolower($0)}')"
 instance_name="$(echo -e "${instance_name}" | tr -d '[[:space:]]')"
 
 if [ -d "instances/${instance_name}" ]; then
-  echo "Directory ./instances/${instance_name}/ is present, use another instance name or delete ./instances/${instance_name}/"
+  echo "Directory ./instances/${instance_name}/ already exists, use another instance name or delete with:"
+  echo ""
+  echo "  rm -rf ./instances/${instance_name}"
+  echo ""
   exit 1
 fi
 
 
-# Fetch current bedrock server url.
-echo "Trying to fetch bedrock server url..."
+# Fetch current bedrock server download url.
+echo "Trying to fetch minecraft.net bedrock server url..."
 
 url="$(curl -s https://www.minecraft.net/es-mx/download/server/bedrock/ | grep -P '(https:\/\/.+linux.+\.zip)' -o)"
 filename="$(echo $url | grep -P '(bedrock-server.+\.zip)' -o)"
 
-echo "url: <${url}>"
+echo "url: [${url}]"
+echo "filename: [${filename}]"
+echo ""
 
 
 # Download current bedrock server or skip if already downloaded.
@@ -76,8 +81,9 @@ LD_LIBRARY_PATH=. ./bedrock_server
 EOM
 
 chmod 755 "run/${instance_name}/bedrock_server.sh"
-run_user="$(stat -c "%U" "run/${instance_name}/bedrock_server.sh")"
-run_path="$(readlink -f "run/${instance_name}/bedrock_server.sh")"
+run_user="$(stat -c "%U" "run/${instance_name}/bedrock_server")"
+run_path="$(readlink -f "run/${instance_name}/")"
+exec_path="$(readlink -f "run/${instance_name}/bedrock_server")"
 
 
 # Create directory for instance files at ./instances/<instance name>
@@ -103,11 +109,14 @@ After=network-online.target
 [Service]
 Type=simple
 User=$run_user
-ExecStart=$run_path
+Environment=LD_LIBRARY_PATH=$run_path
+ExecStart=$exec_path
 
 [Install]
 WantedBy=multi-user.target
 EOM
+
+printf "%s" "$filename" > "instances/${instance_name}/running-version"
 
 
 # Link instance files to run directory.
@@ -121,7 +130,7 @@ ln -rsf "instances/${instance_name}/whitelist.json" "run/${instance_name}/whitel
 
 
 echo ""
-echo "Bedrock Server import completed."
+echo "Bedrock Server import to new instance completed."
 echo "To create, enable and start the systemd service for <${instance_name}>, run:"
 echo ""
 echo "  sudo ./install-service ${instance_name}"

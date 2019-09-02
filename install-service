@@ -5,8 +5,8 @@
 # Usage: ./install-service <instance name>
 #
 #   <instance name>
-#     Name of the instance that will be installed.
-#
+#     Name of the instance that will be installed. This argument
+#     will be converted to lowercase and it's whitespace trimmed.
 
 # Script arguments.
 instance_name=$1
@@ -44,8 +44,8 @@ systemctl start "mcbs-${instance_name}"
 
 
 echo ""
-echo "Bedrock Server service install completed."
+echo "Bedrock Server instance service install completed."
 echo "To verify the service status, run:"
 echo ""
-echo "  sudo systemctl status mcbs-${instance_name}"
+echo "  systemctl status mcbs-${instance_name}"
 echo ""
