@@ -14,7 +14,7 @@ instance_name=$1
 
 # Abort if script is not running as root.
 if ! [ $(id -u) = 0 ]; then
-   echo "This script must be run as root"
+   echo "This script must be run as root."
    exit 1
 fi
 
@@ -30,22 +30,30 @@ if [ ! -f $unit_file ]; then
 fi
 
 
-# Link unit file to /etc/systemd/system
-unit_file_absolute="$(readlink -f "${unit_file}")"
+# Stop and disable service if /etc/systemd/system/mcbs-<instance_name>.service exists
+service_name="mcbs-${instance_name}"
+unit_file_destiny="/etc/systemd/system/${service_name}.service"
+if [ -f $unit_file_destiny ]; then
+  systemctl stop $service_name
+  systemctl disable $service_name
+fi
 
-ln -sf $unit_file_absolute "/etc/systemd/system/mcbs-${instance_name}.service"
-echo "Created link to mcbs-${instance_name}.service in /etc/systemd/system"
+
+# Copy systemd unit file to /etc/systemd/system/
+
+cp --remove-destination $unit_file $unit_file_destiny
+echo "Copied mcbs-${instance_name}.service to /etc/systemd/system/"
 
 
 # Enable and start the service
 echo "Enabling and starting the service."
-systemctl enable "mcbs-${instance_name}"
-systemctl start "mcbs-${instance_name}"
+systemctl enable $service_name
+systemctl start $service_name
 
 
 echo ""
 echo "Bedrock Server instance service install completed."
 echo "To verify the service status, run:"
 echo ""
-echo "  systemctl status mcbs-${instance_name}"
+echo "  systemctl status ${service_name}"
 echo ""

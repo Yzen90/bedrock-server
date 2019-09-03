@@ -82,7 +82,7 @@ EOM
 
 chmod 755 "run/${instance_name}/bedrock_server.sh"
 run_user="$(stat -c "%U" "run/${instance_name}/bedrock_server")"
-run_path="$(readlink -f "run/${instance_name}/")"
+run_path="$(readlink -f "run/${instance_name}")"
 exec_path="$(readlink -f "run/${instance_name}/bedrock_server")"
 
 
@@ -91,7 +91,7 @@ exec_path="$(readlink -f "run/${instance_name}/bedrock_server")"
 # Create systemd service unit file.
 mkdir "instances/${instance_name}"
 
-echo "Importing bedrock server files..."
+echo "Importing bedrock server files to .instances/${instance_name}/"
 
 cp -R "${source_dir}/worlds" "instances/${instance_name}/worlds"
 
@@ -109,7 +109,8 @@ After=network-online.target
 [Service]
 Type=simple
 User=$run_user
-Environment=LD_LIBRARY_PATH=$run_path
+WorkingDirectory=$run_path
+Environment=LD_LIBRARY_PATH=.
 ExecStart=$exec_path
 
 [Install]

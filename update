@@ -16,9 +16,9 @@ instance_name=$1
 instance_name="$(echo "$instance_name" | awk '{print tolower($0)}')"
 instance_name="$(echo -e "${instance_name}" | tr -d '[[:space:]]')"
 
-active_status="$(systemctl status mcbs-${instance_name} | grep -P '(Active: active)' -o)"
+active_status="$(systemctl is-active mcbs-${instance_name})"
 
-if [ "$active_status" == "Active: active" ]; then
+if [ "$active_status" == "active" ]; then
   echo "Service mcbs-${instance_name} is active. To stop it, run:"
   echo ""
   echo "  sudo systemctl stop mcbs-${instance_name}"
