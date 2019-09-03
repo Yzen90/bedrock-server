@@ -27,6 +27,15 @@ if [ "$active_status" == "active" ]; then
 fi
 
 
+# Abort if the run directory of the instance does not have bedrock_server.sh file.
+launcher_file="run/${instance_name}/bedrock_server.sh"
+
+if [ ! -f $launcher_file ]; then
+  echo "<${instance_name}> does not appear to be a bedrock server instance."
+  exit 1
+fi
+
+
 # Fetch current bedrock server download url.
 echo "Trying to fetch minecraft.net bedrock server url..."
 
@@ -64,16 +73,6 @@ else
 fi
 
 
-# Create ./instances/ and ./run/ if not exists.
-if [ ! -d instances ]; then
-  mkdir instances
-fi
-
-if [ ! -d run ]; then
-  mkdir run
-fi
-
-
 # Delete ./run/<instance name> to extract new bedrock server zip file.
 # Create launcher script for instance.
 # Update ./instances/<instance name>/running-version
@@ -86,13 +85,13 @@ unzip -qq "cache/${filename}" -d "run/${instance_name}/"
 
 echo "Finished extraction."
 
-cat > "run/${instance_name}/bedrock_server.sh" <<- EOM
+cat > "${launcher_file}" <<- EOM
 #!/bin/bash
 cd "\${0%/*}"
 LD_LIBRARY_PATH=. ./bedrock_server
 EOM
 
-chmod 755 "run/${instance_name}/bedrock_server.sh"
+chmod 755 "${launcher_file}"
 
 printf "%s" "$filename" > "instances/${instance_name}/running-version"
 
