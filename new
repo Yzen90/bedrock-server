@@ -1,12 +1,8 @@
 #!/bin/bash
 
-# Import existing bedrock server files
+# Create a new bedrock server instance
 
-# Usage: ./import <source directory> <instance name>
-#
-#   <source directory>
-#     Path of directory that contains existing worlds directory and permissions.json, server.properties,
-#     whitelist.json files.
+# Usage: ./new <instance name>
 #
 #   <instance name>
 #     Name that will be used as the systemd service name in the form of `mcbs-<instance name>` and
@@ -14,9 +10,7 @@
 #     will be converted to lowercase and it's whitespace trimmed.
 
 # Script arguments.
-source_dir=$1
 instance_name=$2
-
 
 # Abort if <instance name> already exists in instances directory.
 instance_name="$(echo "$instance_name" | awk '{print tolower($0)}')"
@@ -86,18 +80,18 @@ run_path="$(readlink -f "run/${instance_name}")"
 exec_path="$(readlink -f "run/${instance_name}/bedrock_server")"
 
 
+
 # Create directory for instance files at ./instances/<instance name>
-# Copy the existing bedrock server files to ./instances/<instance name>
+# Create bedrock server files
 # Create systemd service unit file.
 mkdir "instances/${instance_name}"
+mkdir "instances/${instance_name}/worlds"
 
-echo "Importing bedrock server files to .instances/${instance_name}/"
+echo "Creating bedrock server files at .instances/${instance_name}/"
 
-cp -R "${source_dir}/worlds" "instances/${instance_name}/worlds"
-
-cp "${source_dir}/permissions.json" "instances/${instance_name}/permissions.json"
-cp "${source_dir}/server.properties" "instances/${instance_name}/server.properties"
-cp "${source_dir}/whitelist.json" "instances/${instance_name}/whitelist.json"
+cp "run/${instance_name}/permissions.json" "instances/${instance_name}/permissions.json"
+cp "run/${instance_name}/server.properties" "instances/${instance_name}/server.properties"
+cp "run/${instance_name}/whitelist.json" "instances/${instance_name}/whitelist.json"
 
 cat > "instances/${instance_name}/mcbs-${instance_name}.service" <<- EOM
 [Unit]
@@ -132,8 +126,36 @@ ln -rsf "instances/${instance_name}/server.properties" "run/${instance_name}/ser
 ln -rsf "instances/${instance_name}/whitelist.json" "run/${instance_name}/whitelist.json"
 
 
+# Configure the new Bedrock Server instance
+PS3="?"
 echo ""
-echo "Bedrock Server import to new instance completed."
+echo "New instance server.properties configuration"
+
+read -p 'Server name: ' server_name
+
+echo "Game mode:"
+select game_mode in "survival" "creative" "adventure"
+
+echo "Difficulty:"
+select difficulty in "peaceful" "easy" "normal" "hard"
+
+echo "Allow cheats:"
+select allow_cheats in "false" "true"
+
+read -p 'Server IPv4 port: ' server_port
+read -p 'Server IPv6 port : ' server_portv6
+read -p 'View distance: ' view_distance
+read -p 'Max threads: ' max_threads
+read -p 'Level name: ' level_name
+read -p 'Level seed: ' level_seed
+
+echo ""
+echo "Saving configuration..."
+
+server_properties="$(cat instances/${instance_name}/server.properties)"
+
+echo ""
+echo "Bedrock Server new instance creation completed."
 echo "To create, enable and start the systemd service for <${instance_name}>, run:"
 echo ""
 echo "  sudo ./install-service ${instance_name}"

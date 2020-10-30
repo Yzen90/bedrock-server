@@ -93,6 +93,8 @@ EOM
 
 chmod 755 "${launcher_file}"
 
+
+# Save the current minecraft bedrock server version
 printf "%s" "$filename" > "instances/${instance_name}/running-version"
 
 
