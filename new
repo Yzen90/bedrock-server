@@ -134,13 +134,13 @@ echo "New instance server.properties configuration"
 read -p 'Server name: ' server_name
 
 echo "Game mode:"
-select game_mode in "survival" "creative" "adventure"
+select game_mode in "survival" "creative" "adventure";
 
 echo "Difficulty:"
-select difficulty in "peaceful" "easy" "normal" "hard"
+select difficulty in "peaceful" "easy" "normal" "hard";
 
 echo "Allow cheats:"
-select allow_cheats in "false" "true"
+select allow_cheats in "false" "true";
 
 read -p 'Server IPv4 port: ' server_port
 read -p 'Server IPv6 port : ' server_portv6
