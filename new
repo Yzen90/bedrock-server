@@ -153,6 +153,20 @@ echo ""
 echo "Saving configuration..."
 
 server_properties="$(cat instances/${instance_name}/server.properties)"
+server_properties=`sed -e "s/^server-name=.*$/server-name=${server_name}/" <<< "${server_properties}"`
+server_properties=`sed -e "s/^gamemode=.*$/gamemode=${game_mode}/" <<< "${server_properties}"`
+server_properties=`sed -e "s/^difficulty=.*$/difficulty=${difficulty}/" <<< "${server_properties}"`
+server_properties=`sed -e "s/^allow-cheats=.*$/allow-cheats=${allow_cheats}/" <<< "${server_properties}"`
+server_properties=`sed -e "s/^server-port=.*$/server-port=${server_port}/" <<< "${server_properties}"`
+server_properties=`sed -e "s/^server-portv6=.*$/server-portv6=${server_portv6}/" <<< "${server_properties}"`
+server_properties=`sed -e "s/^view-distance=.*$/view-distance=${view_distance}/" <<< "${server_properties}"`
+server_properties=`sed -e "s/^max-threads=.*$/max-threads=${max_threads}/" <<< "${server_properties}"`
+server_properties=`sed -e "s/^level-name=.*$/level-name=${level_name}/" <<< "${server_properties}"`
+server_properties=`sed -e "s/^level-seed=.*$/level-seed=${level_seed}/" <<< "${server_properties}"`
+
+printf "%s\n" "$server_properties" > "instances/${instance_name}/server.properties"
+
+echo "server.properties has been saved."
 
 echo ""
 echo "Bedrock Server new instance creation completed."

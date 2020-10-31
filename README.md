@@ -47,7 +47,10 @@ Or download and extract in directory that conains existing bedrock-server-master
 
 ## New bedrock server instance
 
-    TODO
+`./new <instance name>`
+
+- `<instance name>` Name that will be used as the systemd service name in the form of `mcbs-<instance name>` and in the `./instances` and `./run` directories for the new bedrock server instance. This argument will be converted to lowercase and it's whitespace trimmed.
+
 
 [Back to top](#minecraft-bedrock-server-convenience-scripts)
 
