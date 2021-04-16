@@ -45,14 +45,17 @@ cp --remove-destination $unit_file $unit_file_destiny
 echo "Copied mcbs-${instance_name}.service to /etc/systemd/system/"
 
 
-# Enable and start the service
-echo "Enabling and starting the service."
-systemctl enable $service_name
-systemctl start $service_name
-
-
 echo ""
 echo "Bedrock Server instance service install completed."
+echo ""
+echo "To start the service, run:"
+echo ""
+echo "  systemctl start ${service_name}"
+echo ""
+echo "To enable the service(to start on boot), run:"
+echo ""
+echo "  systemctl enable ${service_name}"
+echo ""
 echo "To verify the service status, run:"
 echo ""
 echo "  systemctl status ${service_name}"

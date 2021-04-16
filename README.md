@@ -3,13 +3,16 @@
 ### Tested with Ubuntu Server 18.04
 
 ## Contents
-1. [Get the scripts](#get-the-scripts)
-2. [Update the scripts](#update-the-scripts)
-3. [New bedrock server instance](#new-bedrock-server-instance)
-4. [Import existing bedrock server files to new instance](#import-existing-bedrock-server-files-to-new-instance)
-   1. [Import example](#import-example)
-5. [Update bedrock server instance](#update-bedrock-server-instance)
-   1. [Instance update example](#instance-update-example)
+- [Minecraft™ Bedrock Server convenience scripts](#minecraft-bedrock-server-convenience-scripts)
+    - [Tested with Ubuntu Server 18.04](#tested-with-ubuntu-server-1804)
+  - [Contents](#contents)
+  - [Get the scripts](#get-the-scripts)
+  - [Update the scripts](#update-the-scripts)
+  - [New bedrock server instance](#new-bedrock-server-instance)
+  - [Import existing bedrock server files to new instance](#import-existing-bedrock-server-files-to-new-instance)
+    - [Import example](#import-example)
+  - [Update bedrock server instance](#update-bedrock-server-instance)
+    - [Instance update example](#instance-update-example)
 
 ## Get the scripts
 
@@ -51,6 +54,7 @@ Or download and extract in directory that conains existing bedrock-server-master
 
 - `<instance name>` Name that will be used as the systemd service name in the form of `mcbs-<instance name>` and in the `./instances` and `./run` directories for the new bedrock server instance. This argument will be converted to lowercase and it's whitespace trimmed.
 
+After creation the bedrock server instance can be run with `./run/<instance name>/bedrock_server.sh`. To create the systemd service for the instance, run `sudo ./install-service <instance name>`. After service install, run `systemctl status mcbs-<instance name>` to verify the service status.
 
 [Back to top](#minecraft-bedrock-server-convenience-scripts)
 
@@ -62,7 +66,7 @@ Or download and extract in directory that conains existing bedrock-server-master
 
 - `<instance name>` Name that will be used as the systemd service name in the form of `mcbs-<instance name>` and in the `./instances` and `./run` directories for the new bedrock server instance. This argument will be converted to lowercase and it's whitespace trimmed.
 
-After the import is completed the bedrock server instance can be run with `./run/<instance name>/bedrock_server.sh` or to create, enable and start the systemd service for the instance, run `sudo ./install-service <instance name>`. After service install, run `systemctl status mcbs-<instance name>` to verify that the bedrock server instance is running properly.
+After the import is completed the bedrock server instance can be run with `./run/<instance name>/bedrock_server.sh`. To create the systemd service for the instance, run `sudo ./install-service <instance name>`. After service install, run `systemctl status mcbs-<instance name>` to verify the service status.
 
 
 ### Import example
