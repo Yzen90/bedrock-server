@@ -95,6 +95,7 @@ LD_LIBRARY_PATH=. ./bedrock_server
 EOM
 
 chmod 755 "run/${instance_name}/bedrock_server.sh"
+chmod +x "run/${instance_name}/bedrock_server"
 run_user="$(stat -c "%U" "run/${instance_name}/bedrock_server")"
 run_path="$(readlink -f "run/${instance_name}")"
 exec_path="$(readlink -f "run/${instance_name}/bedrock_server")"

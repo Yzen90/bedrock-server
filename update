@@ -106,6 +106,7 @@ LD_LIBRARY_PATH=. ./bedrock_server
 EOM
 
 chmod 755 "${launcher_file}"
+chmod +x "run/${instance_name}/bedrock_server"
 
 
 # Save the current minecraft bedrock server version
