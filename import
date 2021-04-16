@@ -46,7 +46,7 @@ echo ""
 if [ -f "cache/${filename}" ]; then
   echo "${filename} exists in cache directory, download will be skipped."
 else
-  printf "Downloading... "
+  printf "Downloading..."
   wget $url -q -P cache/ &
   
   pid=$!
@@ -57,11 +57,11 @@ else
   while kill -0 $pid 2>/dev/null
   do
     i=$(( (i+1) %4 ))
-    printf "\r${spin:$i:1}"
+    printf "\rDownloading... ${spin:$i:1}"
     sleep .1
   done
 
-  printf "\r \n"
+  printf "\rDownloading...  \n"
   echo "Download finished."
 fi
 
