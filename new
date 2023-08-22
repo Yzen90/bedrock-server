@@ -28,7 +28,7 @@ fi
 # Fetch current bedrock server download url.
 echo "Trying to fetch minecraft.net bedrock server url..."
 
-url="$(curl -s https://www.minecraft.net/en-us/download/server/bedrock -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36 Edg/93.0.961.38" | grep -P '(https:\/\/.+linux.+\.zip)' -o)"
+url="$(curl -s https://www.minecraft.net/en-us/download/server/bedrock -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36 Edg/93.0.961.38" | grep -P '(https:\/\/.+linux\/.+\.zip)' -o)"
 filename="$(echo $url | grep -P '(bedrock-server.+\.zip)' -o)"
 
 echo "url: [${url}]"
