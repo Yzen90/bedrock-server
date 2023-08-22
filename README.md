@@ -62,7 +62,7 @@ After creation the bedrock server instance can be run with `./run/<instance name
 
 `./import <source directory> <instance name>`
 
-- `<source directory>` Path of directory that contains existing worlds directory and permissions.json, server.properties, whitelist.json files.
+- `<source directory>` Path of directory that contains existing worlds directory and permissions.json, server.properties, allowlist.json files.
 
 - `<instance name>` Name that will be used as the systemd service name in the form of `mcbs-<instance name>` and in the `./instances` and `./run` directories for the new bedrock server instance. This argument will be converted to lowercase and it's whitespace trimmed.
 
@@ -79,7 +79,7 @@ Source directory:
           └─ bedrock/
              ├─ permissions.json
              ├─ server.properties
-             ├─ whitelist.json
+             ├─ allowlist.json
              └─ worlds/
                 └─ ...
 

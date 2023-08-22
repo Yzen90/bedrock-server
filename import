@@ -6,7 +6,7 @@
 #
 #   <source directory>
 #     Path of directory that contains existing worlds directory and permissions.json, server.properties,
-#     whitelist.json files.
+#     allowlist.json files.
 #
 #   <instance name>
 #     Name that will be used as the systemd service name in the form of `mcbs-<instance name>` and
@@ -34,7 +34,7 @@ fi
 # Fetch current bedrock server download url.
 echo "Trying to fetch minecraft.net bedrock server url..."
 
-url="$(curl -s https://www.minecraft.net/en-us/download/server/bedrock -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36 Edg/93.0.961.38" | grep -P '(https:\/\/.+linux.+\.zip)' -o)"
+url="$(curl -s https://www.minecraft.net/en-us/download/server/bedrock -A "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/93.0.4577.82 Safari/537.36 Edg/93.0.961.38" | grep -P '(https:\/\/.+linux\/.+\.zip)' -o)"
 filename="$(echo $url | grep -P '(bedrock-server.+\.zip)' -o)"
 
 echo "url: [${url}]"
@@ -112,7 +112,7 @@ cp -R "${source_dir}/worlds" "instances/${instance_name}/worlds"
 
 cp "${source_dir}/permissions.json" "instances/${instance_name}/permissions.json"
 cp "${source_dir}/server.properties" "instances/${instance_name}/server.properties"
-cp "${source_dir}/whitelist.json" "instances/${instance_name}/whitelist.json"
+cp "${source_dir}/allowlist.json" "instances/${instance_name}/allowlist.json"
 
 cat > "instances/${instance_name}/mcbs-${instance_name}.service" <<- EOM
 [Unit]
@@ -144,7 +144,7 @@ ln -rsf "instances/${instance_name}/worlds" "run/${instance_name}/worlds"
 
 ln -rsf "instances/${instance_name}/permissions.json" "run/${instance_name}/permissions.json"
 ln -rsf "instances/${instance_name}/server.properties" "run/${instance_name}/server.properties"
-ln -rsf "instances/${instance_name}/whitelist.json" "run/${instance_name}/whitelist.json"
+ln -rsf "instances/${instance_name}/allowlist.json" "run/${instance_name}/allowlist.json"
 
 
 echo ""

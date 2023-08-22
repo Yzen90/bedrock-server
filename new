@@ -106,7 +106,7 @@ echo "Creating bedrock server files at .instances/${instance_name}/"
 
 cp "run/${instance_name}/permissions.json" "instances/${instance_name}/permissions.json"
 cp "run/${instance_name}/server.properties" "instances/${instance_name}/server.properties"
-cp "run/${instance_name}/whitelist.json" "instances/${instance_name}/whitelist.json"
+cp "run/${instance_name}/allowlist.json" "instances/${instance_name}/allowlist.json"
 
 cat > "instances/${instance_name}/mcbs-${instance_name}.service" <<- EOM
 [Unit]
@@ -138,7 +138,7 @@ ln -rsf "instances/${instance_name}/worlds" "run/${instance_name}/worlds"
 
 ln -rsf "instances/${instance_name}/permissions.json" "run/${instance_name}/permissions.json"
 ln -rsf "instances/${instance_name}/server.properties" "run/${instance_name}/server.properties"
-ln -rsf "instances/${instance_name}/whitelist.json" "run/${instance_name}/whitelist.json"
+ln -rsf "instances/${instance_name}/allowlist.json" "run/${instance_name}/allowlist.json"
 
 
 # Configure the new Bedrock Server instance
@@ -157,12 +157,17 @@ select difficulty in "peaceful" "easy" "normal" "hard"; do break; done
 echo "Allow cheats:"
 select allow_cheats in "false" "true"; do break; done
 
+echo "Default player permission level"
+select default_player_permission_level in "visitor" "member" "operator"; do break; done
+
+read -p 'Max players: ' max_players
 read -p 'Server IPv4 port: ' server_port
 read -p 'Server IPv6 port : ' server_portv6
-read -p 'View distance: ' view_distance
-read -p 'Max threads: ' max_threads
 read -p 'Level name: ' level_name
 read -p 'Level seed: ' level_seed
+read -p 'View distance: ' view_distance
+read -p 'Max threads: ' max_threads
+read -p 'Tick distance: ' tick_distance
 
 echo ""
 echo "Saving configuration..."
@@ -172,12 +177,15 @@ server_properties=`sed -e "s/^server-name=.*$/server-name=${server_name}/" <<< "
 server_properties=`sed -e "s/^gamemode=.*$/gamemode=${game_mode}/" <<< "${server_properties}"`
 server_properties=`sed -e "s/^difficulty=.*$/difficulty=${difficulty}/" <<< "${server_properties}"`
 server_properties=`sed -e "s/^allow-cheats=.*$/allow-cheats=${allow_cheats}/" <<< "${server_properties}"`
+server_properties=`sed -e "s/^default-player-permission-level=.*$/default-player-permission-level=${default_player_permission_level}/" <<< "${server_properties}"`
+[[ ! -z "$max_players" ]] && server_properties=`sed -e "s/^max-players=.*$/max-players=${max_players}/" <<< "${server_properties}"`
 [[ ! -z "$server_port" ]] && server_properties=`sed -e "s/^server-port=.*$/server-port=${server_port}/" <<< "${server_properties}"`
 [[ ! -z "$server_portv6" ]] && server_properties=`sed -e "s/^server-portv6=.*$/server-portv6=${server_portv6}/" <<< "${server_properties}"`
-[[ ! -z "$view_distance" ]] && server_properties=`sed -e "s/^view-distance=.*$/view-distance=${view_distance}/" <<< "${server_properties}"`
-[[ ! -z "$max_threads" ]] && server_properties=`sed -e "s/^max-threads=.*$/max-threads=${max_threads}/" <<< "${server_properties}"`
 [[ ! -z "$level_name" ]] && server_properties=`sed -e "s/^level-name=.*$/level-name=${level_name}/" <<< "${server_properties}"`
 [[ ! -z "$level_seed" ]] && server_properties=`sed -e "s/^level-seed=.*$/level-seed=${level_seed}/" <<< "${server_properties}"`
+[[ ! -z "$view_distance" ]] && server_properties=`sed -e "s/^view-distance=.*$/view-distance=${view_distance}/" <<< "${server_properties}"`
+[[ ! -z "$max_threads" ]] && server_properties=`sed -e "s/^max-threads=.*$/max-threads=${max_threads}/" <<< "${server_properties}"`
+[[ ! -z "$tick_distance" ]] && server_properties=`sed -e "s/^tick-distance=.*$/tick-distance=${tick_distance}/" <<< "${server_properties}"`
 
 printf "%s\n" "$server_properties" > "instances/${instance_name}/server.properties"
 
